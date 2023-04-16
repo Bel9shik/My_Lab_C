@@ -52,7 +52,7 @@ int main(void){
 
         int res = sudoku_solver(matrix,strings,columns,boxes);
         if(res == 0){
-            fprintf(fl_out,"Судоку не решается\n\n");
+            fprintf(fl_out,"Sudoku has no solutions\n\n");
             continue;
         }
 
