@@ -1,10 +1,12 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
 #define n 9
-int sudoku_solver (int matrix[n][n], int strings[n][n + 1], int columns[n][n + 1], int boxes[n][n + 1]);
+int sudoku_solver (int **matrix, int** strings, int** columns, int** boxes);
 
 int main(void){
+        clock_t start = clock(); //  time testing
     FILE *fl_in = fopen("input.txt", "r");
     FILE *fl_out = fopen("output.txt", "w");
     if(fl_in == NULL){
@@ -16,7 +18,35 @@ int main(void){
     fscanf(fl_in,"%d\n",&repeats);
 
     for(int r = 0; r < repeats; r ++){
-        int matrix[n][n] = {0}, strings [n][n + 1] = {0}, columns [n][n+ 1] = {0}, boxes [n][n + 1] = {0};
+        int **matrix = calloc(n, sizeof(int*));
+        for (int i=0;i<n;++i) {
+            matrix[i] = calloc(n, sizeof(int));
+            if(matrix[i] == NULL){
+                printf("Not memory enough");
+                return 1;
+            }
+        }
+        int** strings = calloc(n, sizeof (int *));
+        int** columns = calloc(n, sizeof (int *));
+        int** boxes = calloc(n, sizeof (int *));
+        for(int i = 0; i < n; i ++){
+            strings[i] = calloc(n + 1, sizeof(int));
+            if(strings[i] == NULL){
+                printf("Not memory enough");
+                return 1;
+            }
+            columns[i] = calloc(n + 1, sizeof(int));
+            if(columns[i] == NULL){
+                printf("Not memory enough");
+                return 1;
+            }
+            boxes[i] = calloc(n + 1, sizeof(int));
+
+            if(boxes[i] == NULL){
+                printf("Not memory enough");
+                return 1;
+            }
+        }
         char curVal = '\n';
         int curNum;
         while (curVal == '\n') {
@@ -63,14 +93,26 @@ int main(void){
             fprintf(fl_out,"\n");
         }
         fprintf(fl_out, "\n");
+        for(int i = 0 ; i < n; i ++){
+            free(strings[i]);
+            free(columns[i]);
+            free(boxes[i]);
+        }
+        free(columns);
+        free(boxes);
+        free(strings);
     }
 
     fclose(fl_in);
     fclose(fl_out);
+    clock_t end = clock();
+    double time_spent = (double)(end - start) / CLOCKS_PER_SEC;
+
+    printf("The elapsed time is %f seconds", time_spent); // time testing
     return 1;
 }
 
-int sudoku_solver (int matrix[n][n], int strings[n][n + 1], int columns[n][n + 1], int boxes[n][n + 1]){
+int sudoku_solver (int **matrix, int** strings, int** columns, int** boxes){
     int tmp_maxSum = -10, type  = 0, maxIndex = -10, total_filled_cells = 0;
 
     for(int i = 0; i < n; i ++){
