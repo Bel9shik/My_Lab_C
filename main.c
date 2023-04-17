@@ -1,12 +1,10 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <time.h>
 
 #define n 9
-int sudoku_solver (int **matrix, int** strings, int** columns, int** boxes);
+int sudoku_solver (int matrix[n][n], int strings[n][n + 1], int columns[n][n + 1], int boxes[n][n + 1]);
 
 int main(void){
-        clock_t start = clock(); //  time testing
     FILE *fl_in = fopen("input.txt", "r");
     FILE *fl_out = fopen("output.txt", "w");
     if(fl_in == NULL){
@@ -18,52 +16,25 @@ int main(void){
     fscanf(fl_in,"%d\n",&repeats);
 
     for(int r = 0; r < repeats; r ++){
-        int **matrix = calloc(n, sizeof(int*));
-        for (int i=0;i<n;++i) {
-            matrix[i] = calloc(n, sizeof(int));
-            if(matrix[i] == NULL){
-                printf("Not memory enough");
-                return 1;
-            }
-        }
-        int** strings = calloc(n, sizeof (int *));
-        int** columns = calloc(n, sizeof (int *));
-        int** boxes = calloc(n, sizeof (int *));
-        for(int i = 0; i < n; i ++){
-            strings[i] = calloc(n + 1, sizeof(int));
-            if(strings[i] == NULL){
-                printf("Not memory enough");
-                return 1;
-            }
-            columns[i] = calloc(n + 1, sizeof(int));
-            if(columns[i] == NULL){
-                printf("Not memory enough");
-                return 1;
-            }
-            boxes[i] = calloc(n + 1, sizeof(int));
-
-            if(boxes[i] == NULL){
-                printf("Not memory enough");
-                return 1;
-            }
-        }
+        int matrix[n][n] = {0}, strings [n][n + 1] = {0}, columns [n][n+ 1] = {0}, boxes [n][n + 1] = {0}; // в трёх последних массивах хранятся данные по принципу
+// (индекс массива + 1) = цифра, которая есть в строке/столбце/квадрате, а в последней ячейке хранится количество заполненных ячеек
         char curVal = '\n';
         int curNum;
-        while (curVal == '\n') {
+        while (curVal == '\n') { // считывание всех '\n' (сделано, для того, чтобы не было проблем с вводом данных)
             fscanf(fl_in, "%c", &curVal);
         }
-        fseek(fl_in, -1, SEEK_CUR);
-        for(int i = 0; i < n; i++){
+        fseek(fl_in, -1, SEEK_CUR); //в последний раз сработал while и указатель сместился на символ правее, поэтому эта строка нужна, чтобы вернуть указатель на нужное место
+        for(int i = 0; i < n; i++){ // проходимся по матрице
             for(int j = 0; j < n; j++){
                 fscanf(fl_in, "%c", &curVal);
-                if(curVal != '.'){
+                if(curVal != '.'){ // если считано число
                     curNum = curVal - '0';
-                    matrix[i][j] = curNum;
-                    strings[i][curNum - 1] = 1;
-                    strings[i][n] ++;
-                    columns[j][curNum - 1] = 1;
-                    columns[j][n] ++;
-                    int box_ind;
+                    matrix[i][j] = curNum; //запись числа в таблицу
+                    strings[i][curNum - 1] = 1; // показываем, что такое число есть в этой строке
+                    strings[i][n] ++;// увеличиваем количество заполненных ячеек в строке
+                    columns[j][curNum - 1] = 1;// показываем, что такое число есть в этом столбце
+                    columns[j][n] ++; // увеличиваем количество заполненных ячеек в столбце
+                    int box_ind; //if's слизу для того, чтобы понять в каком квадрате мы находимся
                     if(i <= 2 && j <= 2) box_ind = 0;
                     else if(i <= 2 && j >= 3 && j <= 5) box_ind = 1;
                     else if(i <= 2 && j >= 6) box_ind = 2;
@@ -73,50 +44,42 @@ int main(void){
                     else if(i >= 6 && j <= 2) box_ind = 6;
                     else if(i >= 6 && j >= 3 && j <= 5) box_ind = 7;
                     else box_ind = 8;
-                    boxes[box_ind][curNum - 1] = 1;
-                    boxes[box_ind][n]++;
+                    boxes[box_ind][curNum - 1] = 1;// показываем, что такое число есть в этой строке
+                    boxes[box_ind][n]++; // увеличиваем количество заполненных ячеек в квадрате
                 }
             }
             fscanf(fl_in, "\n");
         }
 
-        int res = sudoku_solver(matrix,strings,columns,boxes);
-        if(res == 0){
+        int res = sudoku_solver(matrix,strings,columns,boxes); // пробуем решить судоку
+        if(res == 0){ // если нет решений
             fprintf(fl_out,"Sudoku has no solutions\n\n");
             continue;
         }
 
-        for(int i = 0; i < n; i++){
+        for(int i = 0; i < n; i++){ // вывод решенного судоку
             for(int j = 0; j < n; j++){
                 fprintf(fl_out,"%d",matrix[i][j]);
             }
             fprintf(fl_out,"\n");
         }
         fprintf(fl_out, "\n");
-        for(int i = 0 ; i < n; i ++){
-            free(strings[i]);
-            free(columns[i]);
-            free(boxes[i]);
-        }
-        free(columns);
-        free(boxes);
-        free(strings);
     }
 
     fclose(fl_in);
     fclose(fl_out);
-    clock_t end = clock();
-    double time_spent = (double)(end - start) / CLOCKS_PER_SEC;
-
-    printf("The elapsed time is %f seconds", time_spent); // time testing
     return 1;
 }
 
-int sudoku_solver (int **matrix, int** strings, int** columns, int** boxes){
+int sudoku_solver (int matrix[n][n], int strings[n][n + 1], int columns[n][n + 1], int boxes[n][n + 1]){
     int tmp_maxSum = -10, type  = 0, maxIndex = -10, total_filled_cells = 0;
+/* tmp_maxSum - переменная для того, чтобы понять максимальное количество заполненных ячеек (меньше 9)
+ * type  - переменная для того, чтобы понять где больше всего заполнено ячеек (в строке, в столбце или в квадрате)
+ * maxIndex - индекс объекта, где больше всего заполнено ячеек
+ * total_filled_cells - количество заполненных ячеек     */
 
-    for(int i = 0; i < n; i ++){
-        total_filled_cells += boxes[i][n];
+    for(int i = 0; i < n; i ++){ // поиск tmp_maxSum, type и maxIndex
+        total_filled_cells += boxes[i][n]; // считаем, сколько ячеек заполнено в таблице, если будет 80, то это последняя итерация
         if(boxes[i][n] > tmp_maxSum && boxes[i][n] < n){
             type = 1;
             maxIndex = i;
@@ -134,11 +97,14 @@ int sudoku_solver (int **matrix, int** strings, int** columns, int** boxes){
         }
     }
 
-    int mainI = 0, mainJ = 0, maxSum = 0;
+    int mainI = 0, mainJ = 0, maxSum = 0; /*
+ * mainI и mainJ - индексы строки и столбца соответственно, в которых заполнено больше всего ячеек
+ * maxSum - максимальная сумма заполненных ячеек по строке и столбцу
+ */
 
-    switch(type)
+    switch(type) // в зависимости от объекта(строка, столбец или квадрат) выбираем где проверять
     {
-        case 1: {
+        case 1: { //если это квадрат, то записываем в tmp_I и tmp_J левую верхнюю точку нужного нам квадрата
             int tmp_I, tmp_J;
             switch (maxIndex) {
                 case 0:
@@ -178,10 +144,10 @@ int sudoku_solver (int **matrix, int** strings, int** columns, int** boxes){
                     tmp_J = 6;
                     break;
             }
-            for(int i = tmp_I; i < tmp_I + 3; i++){
+            for(int i = tmp_I; i < tmp_I + 3; i++){ //проходимся по этому квадрату и ищем клетку, в которой строке и столбце больше всего чисел уже заполнено
                 for(int j = tmp_J; j < tmp_J + 3; j++){
-                    if(matrix[i][j] == 0){
-                        if(strings[i][n] + columns[j][n] > maxSum){
+                    if(matrix[i][j] == 0){ // если в этой ячейке нет числа
+                        if(strings[i][n] + columns[j][n] > maxSum){ // если в этой строке и стобце наибольшее число заполненных клеток
                             mainI = i;
                             mainJ = j;
                             maxSum = strings[i][n] + columns[j][n];
@@ -191,10 +157,10 @@ int sudoku_solver (int **matrix, int** strings, int** columns, int** boxes){
             }
             break;
         }
-        case 2: {
+        case 2: { // если это строка
             for (int j = 0; j < n; j++) {
-                if (matrix[maxIndex][j] == 0) {
-                    if (boxes[maxIndex / 3 * 3 + j / 3][n] + columns[j][n] > maxSum) {
+                if (matrix[maxIndex][j] == 0) { // если в этой ячейке нет числа
+                    if (boxes[maxIndex / 3 * 3 + j / 3][n] + columns[j][n] > maxSum) { // если в этой строке наибольшее число заполненных клеток
                         mainI = maxIndex;
                         mainJ = j;
                         maxSum = boxes[maxIndex / 3 * 3 + j / 3][n] + columns[j][n];
@@ -204,9 +170,9 @@ int sudoku_solver (int **matrix, int** strings, int** columns, int** boxes){
             break;
         }
         default: {
-            for (int i = 0; i < n; i++) {
-                if (matrix[i][maxIndex] == 0) {
-                    if (boxes[maxIndex / 3 + i / 3 * 3][n] + strings[i][n] > maxSum) {
+            for (int i = 0; i < n; i++) { // если это столбец
+                if (matrix[i][maxIndex] == 0) { // если в этой ячейке нет числа
+                    if (boxes[maxIndex / 3 + i / 3 * 3][n] + strings[i][n] > maxSum) { // если в этом стобце наибольшее число заполненных клеток
                         mainI = i;
                         mainJ = maxIndex;
                         maxSum = boxes[maxIndex / 3 + i / 3 * 3][n] + strings[i][n];
@@ -217,7 +183,7 @@ int sudoku_solver (int **matrix, int** strings, int** columns, int** boxes){
         }
     }
 
-    int box_index;
+    int box_index; //индекс нужного квадрата
     if(mainI <= 2 && mainJ <= 2) box_index = 0;
     else if (mainI <= 2 && mainJ >= 3 && mainJ <= 5) box_index = 1;
     else if(mainI <= 2 && mainJ >= 6) box_index = 2;
@@ -228,8 +194,8 @@ int sudoku_solver (int **matrix, int** strings, int** columns, int** boxes){
     else if (mainI >= 6 && mainJ >= 3 && mainJ <= 5) box_index = 7;
     else box_index = 8;
 
-    for(int i = 0; i < n; i++){
-        if(boxes[box_index][i] == 0 && strings[mainI][i] == 0 && columns[mainJ][i] == 0){
+    for(int i = 0; i < n; i++){ // ищем число, которое можно вставить
+        if(boxes[box_index][i] == 0 && strings[mainI][i] == 0 && columns[mainJ][i] == 0){ // если этого числа нет в строке, столбце и квадрате
             matrix[mainI][mainJ] = i + 1;
             strings[mainI][i] = 1;
             strings[mainI][n] ++;
@@ -237,13 +203,14 @@ int sudoku_solver (int **matrix, int** strings, int** columns, int** boxes){
             columns[mainJ][n] ++;
             boxes[box_index][i]  = 1;
             boxes[box_index][n] ++;
-            if(total_filled_cells == 80){
+            if(total_filled_cells == 80){ //выход из рекурсии, если у нас заполнены все ячейки
                 return 1;
             }
-            int result = sudoku_solver(matrix,strings,columns,boxes);
+            int result = sudoku_solver(matrix,strings,columns,boxes); 
             if(result){
                 return 1;
             }
+            //если это число не подошло, то восстанавливаем то, что было без этого числа
             matrix[mainI][mainJ] = 0;
             strings[mainI][i] = 0;
             strings[mainI][n] --;
