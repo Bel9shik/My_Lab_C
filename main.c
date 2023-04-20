@@ -6,6 +6,10 @@ int sudoku_solver (int matrix[n][n], int strings[n][n + 1], int columns[n][n + 1
 
 int main(void){
     FILE *fl_in = fopen("input.txt", "r");
+    if(fl_in == NULL){
+        fprintf(stderr, "FILE CONNECTION ERROR\n");
+        return 1;
+    }
     FILE *fl_out = fopen("output.txt", "w+");
     fseek(fl_in, 0 , SEEK_END);
     long poss = ftell(fl_in);
