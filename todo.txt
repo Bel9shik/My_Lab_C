@@ -53,7 +53,7 @@
 Выход:
 
 
-Sudoku has no solutions
+Incorrectly input
 
 Пример 3:
 
