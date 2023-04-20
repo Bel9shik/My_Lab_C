@@ -29,18 +29,19 @@ int main(void){
         fseek(fl_in, -1, SEEK_CUR); //в последний раз сработал while и указатель сместился на символ правее, поэтому эта строка нужна, чтобы вернуть указатель на нужное место
         int i = 0, j = 0;
         while(fscanf(fl_in, "%c", &curVal) != EOF){// проходимся по матрице
+            printf("%c", curVal);
             if(i == n){ // проверка, что строк не больше 9
                 while(fscanf(fl_in, "%c", &curVal) != EOF){
                     if(curVal == '\n' || curVal == '\t' || curVal == ' ') continue;
                     fprintf(fl_out,"Incorrectly input");
+                    printf("3) %d - i, %d - j, %c - char", i,j,curVal);
                     return 2;
                 }
                 fseek(fl_in,1,SEEK_CUR);
-                if(!feof(fl_in)){ // проверка конца файла
+                if(!feof(fl_in)){
                     break;
                 }
             }
-            
             if(curVal == '\n'){ // переход на новую строку
                 if(j == n){
                     i ++;
@@ -48,6 +49,7 @@ int main(void){
                     continue;
                 }
                 else{
+                    printf("1) %d - i, %d - j, %c - char", i,j,curVal);
                     fprintf(fl_out,"Incorrectly input");
                     return 2;
                 }
@@ -73,6 +75,7 @@ int main(void){
                 boxes[box_ind][n]++; // увеличиваем количество заполненных ячеек в квадрате
             }
             else if (curVal != '.'){
+                printf("2) %d - i, %d - j, %c - char", i,j,curVal);
                 fprintf(fl_out,"Incorrectly input");
                 return 2;
             }
