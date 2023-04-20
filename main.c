@@ -61,9 +61,9 @@ int main(void){
             if(curVal != '.' && (curVal - '0') > 0 && (curVal - '0') < 10){ // если считано число
                 curNum = curVal - '0';
                 matrix[i][j] = curNum; //запись числа в таблицу
-                strings[i][curNum - 1] = 1; // показываем, что такое число есть в этой строке
+                strings[i][curNum - 1] ++; // показываем, что такое число есть в этой строке
                 strings[i][n] ++;// увеличиваем количество заполненных ячеек в строке
-                columns[j][curNum - 1] = 1;// показываем, что такое число есть в этом столбце
+                columns[j][curNum - 1] ++;// показываем, что такое число есть в этом столбце
                 columns[j][n] ++; // увеличиваем количество заполненных ячеек в столбце
                 int box_ind; //if's снизу для того, чтобы понять в каком квадрате мы находимся (поле поделено на 9 квадратов)
                 if(i <= 2 && j <= 2) box_ind = 0;
@@ -75,7 +75,7 @@ int main(void){
                 else if(i >= 6 && j <= 2) box_ind = 6;
                 else if(i >= 6 && j >= 3 && j <= 5) box_ind = 7;
                 else box_ind = 8;
-                boxes[box_ind][curNum - 1] = 1;// показываем, что такое число есть в этом квадрате
+                boxes[box_ind][curNum - 1] ++;// показываем, что такое число есть в этом квадрате
                 boxes[box_ind][n]++; // увеличиваем количество заполненных ячеек в квадрате
             }
             else if (curVal != '.'){
@@ -84,6 +84,15 @@ int main(void){
                 return 2;
             }
             j++;
+        }
+
+        for(int k = 0; k < n; k++ ){ //проверка на одинаковые числа в строках / столбцах / квадратах
+            for(int l = 0; l < n; l++){
+                if(boxes[k][l] > 1 || strings[k][l] > 1 || columns[k][l] > 1){
+                    fprintf(fl_out,"Incorrectly input");
+                    return 2;
+                }
+            }
         }
 
         int res = sudoku_solver(matrix,strings,columns,boxes); // решаем судоку
