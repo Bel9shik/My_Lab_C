@@ -29,7 +29,6 @@ int main(void){
         fseek(fl_in, -1, SEEK_CUR); //в последний раз сработал while и указатель сместился на символ правее, поэтому эта строка нужна, чтобы вернуть указатель на нужное место
         int i = 0, j = 0;
         while(fscanf(fl_in, "%c", &curVal) != EOF){// проходимся по матрице
-            printf("%c", curVal);
             if(i == n){
                 break;
             }
@@ -40,8 +39,8 @@ int main(void){
                     continue;
                 }
                 else{
-                    printf("1) %d - i, %d - j, %c - char", i,j,curVal);
-                    fprintf(fl_out,"Incorrectly input");
+                    f
+                        (fl_out,"Incorrectly input");
                     return 2;
                 }
             }
@@ -66,7 +65,6 @@ int main(void){
                 boxes[box_ind][n]++; // увеличиваем количество заполненных ячеек в квадрате
             }
             else if (curVal != '.'){
-                printf("2) %d - i, %d - j, %c - char", i,j,curVal);
                 fprintf(fl_out,"Incorrectly input");
                 return 2;
             }
