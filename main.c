@@ -29,18 +29,26 @@ int main(void){
         fseek(fl_in, -1, SEEK_CUR); //в последний раз сработал while и указатель сместился на символ правее, поэтому эта строка нужна, чтобы вернуть указатель на нужное место
         int i = 0, j = 0;
         while(fscanf(fl_in, "%c", &curVal) != EOF){// проходимся по матрице
-            if(i == n){
-                break;
+            if(i == n){ // проверка, что строк не больше 9
+                while(fscanf(fl_in, "%c", &curVal) != EOF){
+                    if(curVal == '\n' || curVal == '\t' || curVal == ' ') continue;
+                    fprintf(fl_out,"Incorrectly input");
+                    return 2;
+                }
+                fseek(fl_in,1,SEEK_CUR);
+                if(!feof(fl_in)){ // проверка конца файла
+                    break;
+                }
             }
-            if(curVal == '\n'){
+            
+            if(curVal == '\n'){ // переход на новую строку
                 if(j == n){
                     i ++;
                     j = 0;
                     continue;
                 }
                 else{
-                    f
-                        (fl_out,"Incorrectly input");
+                    fprintf(fl_out,"Incorrectly input");
                     return 2;
                 }
             }
