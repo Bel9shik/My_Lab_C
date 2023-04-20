@@ -34,7 +34,15 @@ int main(void){
         int i = 0, j = 0;
         while(fscanf(fl_in, "%c", &curVal) != EOF){// проходимся по матрице
             printf("%c", curVal);
+
             if(i == n){ // проверка, что строк не больше 9
+                if(curVal == '\n' || curVal == '\t' || curVal == ' ') {} //обработка ввода после 9 строки в input.txt(если это не '\t' или '\n' или ' ', то 
+                // неверный ввод
+                else {
+                    fprintf(fl_out,"Incorrectly input");
+                    printf("3) %d - i, %d - j, %c - char", i,j,curVal);
+                    return 2;
+                }
                 while(fscanf(fl_in, "%c", &curVal) != EOF){
                     if(curVal == '\n' || curVal == '\t' || curVal == ' ') continue;
                     fprintf(fl_out,"Incorrectly input");
@@ -46,6 +54,7 @@ int main(void){
                     break;
                 }
             }
+
             if(curVal == '\n'){ // переход на новую строку
                 if(j == n){
                     i ++;
