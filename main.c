@@ -42,7 +42,12 @@ int main(void){
         int i = 0, j = 0;
     // проходимся по матрице
         while(fscanf(fl_in, "%c", &curVal) != EOF){
-            printf("%c", curVal);
+            
+            
+            
+            
+            
+            ("%c", curVal);
 
             // проверка, что строк не больше 9
             if(i == n){
@@ -51,13 +56,11 @@ int main(void){
                 // неверный ввод
                 else {
                     fprintf(fl_out,"Incorrectly input");
-                    printf("3) %d - i, %d - j, %c - char", i,j,curVal);
                     return INCORRECTLY_INPUT;
                 }
                 while(fscanf(fl_in, "%c", &curVal) != EOF){
                     if(curVal == '\n' || curVal == '\t' || curVal == ' ') continue;
                     fprintf(fl_out,"Incorrectly input");
-                    printf("3) %d - i, %d - j, %c - char", i,j,curVal);
                     return INCORRECTLY_INPUT;
                 }
                 fseek(fl_in,1,SEEK_CUR);
@@ -74,7 +77,6 @@ int main(void){
                     continue;
                 }
                 else{
-                    printf("1) %d - i, %d - j, %c - char", i,j,curVal);
                     fprintf(fl_out,"Incorrectly input");
                     return INCORRECTLY_INPUT;
                 }
@@ -101,7 +103,6 @@ int main(void){
                 boxes[box_ind][n]++; // увеличиваем количество заполненных ячеек в квадрате
             }
             else if (curVal != '.'){
-                printf("2) %d - i, %d - j, %c - char", i,j,curVal);
                 fprintf(fl_out,"Incorrectly input");
                 return INCORRECTLY_INPUT;
             }
