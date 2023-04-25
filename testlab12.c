@@ -1,7 +1,7 @@
 #include "testLab.h"
 #include <stdio.h>
 
-#define TESTS_COUNT 2
+#define TESTS_COUNT 3
 #define TIME_LIMIT 1000
 #define MEMORY_LIMIT (1 << 10)
 
@@ -48,28 +48,40 @@ static int CheckFromArray(void){
         return -1;
     }
     char buf1[128] = {0};
-    int ind = 0;
+    int ind = 0,passed = 1;
     while(fscanf(stream.Out,"%c",&buf1[ind]) != 0){ind ++;}
     for(int i = 0; i < ind; i++){
         if(testInOut[currentTest].out[i] != buf1[i]){
-            fclose(stream.Out);
+            passed = 0;
             currentTest++;
+            fclose(stream.Out);
+            break;
         }
     }
-    printf("PASSED");
-    currentTest ++;;
+    if(passed){
+        passed = !HaveGarbageAtTheEnd(stream.Out);
+    }
     fclose(stream.Out);
-    return 0;
+    if(passed){
+        printf("PASSED\n");
+        currentTest++;
+        return 0;
+    }
+    else{
+        printf("FAILED\n");
+        currentTest++;
+        return 1;
+    }
 }
 
 const TLabTest labTests[] = {
+        {FeedFromArray,CheckFromArray},
+        {FeedFromArray,CheckFromArray},
         {FeedFromArray,CheckFromArray}
 };
 
 TLabTest GiveLabTest (int testInd){
-    (void) testInd;
-    TLabTest labTest = {FeedFromArray, CheckFromArray};
-    return labTest;
+    return labTests[testInd];
 }
 
 int GiveTestLabCount(void){
