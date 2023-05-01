@@ -6,5 +6,4 @@ set(CMAKE_C_STANDARD 11)
 include_directories(.)
 
 add_executable(My_Lab_C
-        main.c
-        testlab12.c)
+        main.c)

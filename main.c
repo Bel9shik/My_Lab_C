@@ -14,6 +14,7 @@ enum SudokuResults{
 
 int sudoku_solver (int** matrix, int** rows, int** columns, int** boxes);
 int main(void){
+
     FILE *fl_in = fopen("input.txt", "r");
     if(fl_in == NULL){
         fprintf(stderr, "FILE CONNECTION ERROR\n");
@@ -214,6 +215,7 @@ int main(void){
             for(int l = 0; l < n; l++){
                 fprintf(fl_out,"%d",matrix[k][l]);
             }
+            if(k == 8) break;
             fprintf(fl_out,"\n");
         }
         //освобождение памяти
