@@ -8,11 +8,11 @@ enum SudokuResults{
     OK, // 1
     SUDOKU_ALREADY_SOLVED, // 2
     INCORRECTLY_INPUT, // 3
-    FILE_ACCESS_ERROR,
+    FILE_ACCESS_ERROR, //4
+    DONT_ENOUGH_MEMORY //5
 };
 
-int sudoku_solver (int matrix[n][n], int rows[n][n + 1], int columns[n][n + 1], int boxes[n][n + 1]);
-
+int sudoku_solver (int** matrix, int** rows, int** columns, int** boxes);
 int main(void){
     FILE *fl_in = fopen("input.txt", "r");
     if(fl_in == NULL){
@@ -28,8 +28,95 @@ int main(void){
         return FILE_ACCESS_ERROR;
     }
     fseek(fl_in, 0, SEEK_SET); // восстановление указателя на начало файла
+    
+    int** matrix = calloc(n, sizeof(int *));
+    if(matrix == NULL){
+        free(matrix);
+        printf("Can't create the array. Don't enough memory ?");
+        return DONT_ENOUGH_MEMORY;
+    }
+    for(int i = 0; i < n; i++){
+        matrix[i] = calloc(n, sizeof(int));
+        if(matrix[i] == NULL){
+            for(int j = 0; j != i; j++)free(matrix[j]);
+            free(matrix);
+            printf("Can't create the array. Don't enough memory ?");
+            return DONT_ENOUGH_MEMORY;
+        }
+    }
 
-    int matrix[n][n] = {0}, strings [n][n + 1] = {0}, columns [n][n+ 1] = {0}, boxes [n][n + 1] = {0}; // в трёх последних массивах хранятся данные по принципу
+    int** rows = calloc(n, sizeof(int *));
+    if(rows == NULL){
+        free(rows);
+        for(int k = 0; k < n; k++)free(matrix[k]);
+        free(matrix);
+        printf("Can't create the array. Don't enough memory ?");
+        return DONT_ENOUGH_MEMORY;
+    }
+    for(int i = 0; i < n; i++){
+        rows[i] = calloc(n + 1, sizeof(int));
+        if(rows[i] == NULL){
+            for(int k = 0; k < n; k++)free(matrix[k]);
+            free(matrix);
+            for(int j = 0; j != i; j++)free(rows[j]);
+            free(rows);
+            printf("Can't create the array. Don't enough memory ?");
+            return DONT_ENOUGH_MEMORY;
+        }
+    }
+
+    int** columns = calloc(n, sizeof(int *));
+    if(columns == NULL){
+        free(columns);
+        for(int k = 0; k < n; k++)free(matrix[k]);
+        free(matrix);
+        for(int j = 0; j < n ; j++)free(rows[j]);
+        free(rows);
+        printf("Can't create the array. Don't enough memory ?");
+        return DONT_ENOUGH_MEMORY;
+    }
+    for(int i = 0; i < n; i++){
+        columns[i] = calloc(n + 1, sizeof(int));
+        if(columns[i] == NULL){
+            for(int k = 0; k < n; k++)free(matrix[k]);
+            free(matrix);
+            for(int j = 0; j < n; j++)free(rows[j]);
+            free(rows);
+            for(int j = 0; j != i; j++)free(columns[j]);
+            free(columns);
+            printf("Can't create the array. Don't enough memory ?");
+            return DONT_ENOUGH_MEMORY;
+        }
+    }
+
+    int** boxes = calloc(n, sizeof(int *));
+    if(boxes == NULL){
+        free(boxes);
+        for(int k = 0; k < n; k++)free(matrix[k]);
+        free(matrix);
+        for(int j = 0; j < n; j++)free(rows[j]);
+        free(rows);
+        for(int j = 0; j < n; j++)free(columns[j]);
+        free(columns);
+        printf("Can't create the array. Don't enough memory ?");
+        return DONT_ENOUGH_MEMORY;
+    }
+    for(int i = 0; i < n; i++){
+        boxes[i] = calloc(n + 1, sizeof(int));
+        if(boxes[i] == NULL){
+            for(int k = 0; k < n; k++)free(matrix[k]);
+            free(matrix);
+            for(int j = 0; j < n; j++)free(rows[j]);
+            free(rows);
+            for(int j = 0; j < n; j++)free(columns[j]);
+            free(columns);
+            for(int j = 0; j != i; j++)free(boxes[j]);
+            free(boxes);
+            printf("Can't create the array. Don't enough memory ?");
+            return DONT_ENOUGH_MEMORY;
+        }
+    }
+    // в трёх последних массивах хранятся данные по принципу
 // (индекс массива + 1) = цифра, которая есть в строке/столбце/квадрате, а в последней ячейке хранится количество заполненных ячеек
     char curVal = '\n';
     int curNum;
@@ -78,8 +165,8 @@ int main(void){
             if(curVal != '.' && (curVal - '0') > 0 && (curVal - '0') < 10){
                 curNum = curVal - '0';
                 matrix[i][j] = curNum; //запись числа в таблицу
-                strings[i][curNum - 1] ++; // показываем, что такое число есть в этой строке
-                strings[i][n] ++;// увеличиваем количество заполненных ячеек в строке
+                rows[i][curNum - 1] ++; // показываем, что такое число есть в этой строке
+                rows[i][n] ++;// увеличиваем количество заполненных ячеек в строке
                 columns[j][curNum - 1] ++;// показываем, что такое число есть в этом столбце
                 columns[j][n] ++; // увеличиваем количество заполненных ячеек в столбце
                 int box_ind; //if's снизу для того, чтобы понять в каком квадрате мы находимся (поле поделено на 9 квадратов)
@@ -93,7 +180,7 @@ int main(void){
                 else if(i >= 6 && j >= 3 && j <= 5) box_ind = 7;
                 else box_ind = 8;
                 boxes[box_ind][curNum - 1] ++;// показываем, что такое число есть в этом квадрате
-                boxes[box_ind][n]++; // увеличиваем количество заполненных ячеек в квадрате
+                boxes[box_ind][n] ++; // увеличиваем количество заполненных ячеек в квадрате
             }
             else if (curVal != '.'){
                 fprintf(fl_out,"Incorrectly input");
@@ -104,15 +191,15 @@ int main(void){
     //проверка на одинаковые числа в строках / столбцах / квадратах
         for(int k = 0; k < n; k++ ){
             for(int l = 0; l < n; l++){
-                if(boxes[k][l] > 1 || strings[k][l] > 1 || columns[k][l] > 1){
+                if(boxes[k][l] > 1 || rows[k][l] > 1 || columns[k][l] > 1){
                     fprintf(fl_out,"Incorrectly input");
                     return INCORRECTLY_INPUT;
                 }
             }
         }
-
-        int res = sudoku_solver(matrix,strings,columns,boxes); // решаем судоку
+    
         // если нет решений
+        int res = sudoku_solver(matrix, rows, columns, boxes);
         if(res == NO_SOLUTIONS){
             fprintf(fl_out,"Sudoku has no solutions\n\n");
             return NO_SOLUTIONS;
@@ -129,13 +216,24 @@ int main(void){
             }
             fprintf(fl_out,"\n");
         }
+        //освобождение памяти
+        for(int k = 0; k < n; k ++){
+            free(rows[k]);
+            free(columns[k]);
+            free(boxes[k]);
+            free(matrix[k]);
+        }
+        free(matrix);
+        free(rows);
+        free(columns);
+        free(boxes);
 
     fclose(fl_in);
     fclose(fl_out);
     return OK;
 }
 
-int sudoku_solver (int matrix[n][n], int rows[n][n + 1], int columns[n][n + 1], int boxes[n][n + 1]){
+int sudoku_solver (int** matrix, int** rows, int** columns, int** boxes){
     int tmp_maxSum = -10, type  = 0, maxIndex = -10, total_filled_cells = 0;
 /* tmp_maxSum - переменная для того, чтобы понять максимальное количество заполненных ячеек (меньше 9)
  * type  - переменная для того, чтобы понять где больше всего заполнено ячеек (в строке, в столбце или в квадрате)
@@ -161,6 +259,7 @@ int sudoku_solver (int matrix[n][n], int rows[n][n + 1], int columns[n][n + 1], 
             tmp_maxSum = columns[i][n];
         }
     }
+
     // если судоку уже решено
     if(total_filled_cells == 81) return SUDOKU_ALREADY_SOLVED;
 
@@ -279,9 +378,6 @@ int sudoku_solver (int matrix[n][n], int rows[n][n + 1], int columns[n][n + 1], 
         // если этого числа нет в строке, столбце и квадрате
         if(boxes[box_index][i] == 0 && rows[mainI][i] == 0 && columns[mainJ][i] == 0){
             matrix[mainI][mainJ] = i + 1;
-            rows[mainI][i] = 1;
-            rows[mainI][n] ++;
-            columns[mainJ][i] = 1;
             columns[mainJ][n] ++;
             boxes[box_index][i]  = 1;
             boxes[box_index][n] ++;
@@ -289,6 +385,9 @@ int sudoku_solver (int matrix[n][n], int rows[n][n + 1], int columns[n][n + 1], 
             if(total_filled_cells == 80){
                 return OK;
             }
+            rows[mainI][i] = 1;
+            rows[mainI][n] ++;
+            columns[mainJ][i] = 1;
             int result = sudoku_solver(matrix, rows, columns, boxes);
             if(result){
                 return OK;
