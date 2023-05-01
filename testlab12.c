@@ -80,11 +80,11 @@ const TLabTest labTests[] = {
         {FeedFromArray,CheckFromArray}
 };
 
-TLabTest GiveLabTest (int testInd){
+TLabTest GetLabTest (int testInd){
     return labTests[testInd];
 }
 
-int GiveTestLabCount(void){
+int GetTestCount(void){
     return TESTS_COUNT;
 }
 
@@ -92,10 +92,10 @@ const char* GetTesterName(void){
     return "Lab 12 Sudoku solver";
 }
 
-int GiveTestTimeout(void){
+int GetTestTimeout(void){
     return TIME_LIMIT;
 }
 
-size_t GiveTestMemoryLimit(void){
+size_t GetTestMemoryLimit(void){
     return MIN_PROCESS_RSS_BYTES + MEMORY_LIMIT;
 }
