@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 #define n 9
-//test
+
 enum SudokuResults{
     NO_SOLUTIONS, // 0
     OK, // 1
@@ -40,7 +40,7 @@ int main(void){
         if(matrix[i] == NULL){
             for(int j = 0; j != i; j++)free(matrix[j]);
             free(matrix);
-            printf("Can't create the array. Don't enough memory ?");
+            printf("Can't create array. Don't enough memory ?");
             return DONT_ENOUGH_MEMORY;
         }
     }
@@ -50,7 +50,7 @@ int main(void){
         free(rows);
         for(int k = 0; k < n; k++)free(matrix[k]);
         free(matrix);
-        printf("Can't create the array. Don't enough memory ?");
+        printf("Can't create array. Don't enough memory ?");
         return DONT_ENOUGH_MEMORY;
     }
     for(int i = 0; i < n; i++){
@@ -60,7 +60,7 @@ int main(void){
             free(matrix);
             for(int j = 0; j != i; j++)free(rows[j]);
             free(rows);
-            printf("Can't create the array. Don't enough memory ?");
+            printf("Can't create array. Don't enough memory ?");
             return DONT_ENOUGH_MEMORY;
         }
     }
@@ -72,7 +72,7 @@ int main(void){
         free(matrix);
         for(int j = 0; j < n ; j++)free(rows[j]);
         free(rows);
-        printf("Can't create the array. Don't enough memory ?");
+        printf("Can't create array. Don't enough memory ?");
         return DONT_ENOUGH_MEMORY;
     }
     for(int i = 0; i < n; i++){
@@ -84,7 +84,7 @@ int main(void){
             free(rows);
             for(int j = 0; j != i; j++)free(columns[j]);
             free(columns);
-            printf("Can't create the array. Don't enough memory ?");
+            printf("Can't create array. Don't enough memory ?");
             return DONT_ENOUGH_MEMORY;
         }
     }
@@ -98,7 +98,7 @@ int main(void){
         free(rows);
         for(int j = 0; j < n; j++)free(columns[j]);
         free(columns);
-        printf("Can't create the array. Don't enough memory ?");
+        printf("Can't create array. Don't enough memory ?");
         return DONT_ENOUGH_MEMORY;
     }
     for(int i = 0; i < n; i++){
@@ -112,7 +112,7 @@ int main(void){
             free(columns);
             for(int j = 0; j != i; j++)free(boxes[j]);
             free(boxes);
-            printf("Can't create the array. Don't enough memory ?");
+            printf("Can't create array. Don't enough memory ?");
             return DONT_ENOUGH_MEMORY;
         }
     }
