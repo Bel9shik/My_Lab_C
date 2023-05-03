@@ -17,15 +17,14 @@ int main(void){
 
     FILE *fl_in = fopen("in.txt", "r");
     if(fl_in == NULL){
-        fprintf(stderr, "FILE CONNECTION ERROR\n");
+        printf( "FILE CONNECTION ERROR\n");
         return FILE_ACCESS_ERROR;
     }
-    FILE *fl_out = fopen("out.txt", "w+");
     fseek(fl_in, 0 , SEEK_END);
     long poss = ftell(fl_in);
     // если файл пустой
     if(poss == 0){
-        fprintf(fl_out,"File is empty");
+        printf("File is empty");
         return FILE_ACCESS_ERROR;
     }
     fseek(fl_in, 0, SEEK_SET); // восстановление указателя на начало файла
@@ -33,7 +32,7 @@ int main(void){
     int** matrix = calloc(n, sizeof(int *));
     if(matrix == NULL){
         free(matrix);
-        printf("Can't create the array. Don't enough memory ?");
+        printf("Can't create the array. Not enough memory ?");
         return DONT_ENOUGH_MEMORY;
     }
     for(int i = 0; i < n; i++){
@@ -41,7 +40,7 @@ int main(void){
         if(matrix[i] == NULL){
             for(int j = 0; j != i; j++)free(matrix[j]);
             free(matrix);
-            printf("Can't create array. Don't enough memory ?");
+            printf("Can't create array. Not enough memory ?");
             return DONT_ENOUGH_MEMORY;
         }
     }
@@ -51,7 +50,7 @@ int main(void){
         free(rows);
         for(int k = 0; k < n; k++)free(matrix[k]);
         free(matrix);
-        printf("Can't create array. Don't enough memory ?");
+        printf("Can't create array. Not enough memory ?");
         return DONT_ENOUGH_MEMORY;
     }
     for(int i = 0; i < n; i++){
@@ -61,7 +60,7 @@ int main(void){
             free(matrix);
             for(int j = 0; j != i; j++)free(rows[j]);
             free(rows);
-            printf("Can't create array. Don't enough memory ?");
+            printf("Can't create array. Not enough memory ?");
             return DONT_ENOUGH_MEMORY;
         }
     }
@@ -73,7 +72,7 @@ int main(void){
         free(matrix);
         for(int j = 0; j < n ; j++)free(rows[j]);
         free(rows);
-        printf("Can't create array. Don't enough memory ?");
+        printf("Can't create array. Not enough memory ?");
         return DONT_ENOUGH_MEMORY;
     }
     for(int i = 0; i < n; i++){
@@ -85,7 +84,7 @@ int main(void){
             free(rows);
             for(int j = 0; j != i; j++)free(columns[j]);
             free(columns);
-            printf("Can't create array. Don't enough memory ?");
+            printf("Can't create array. Not enough memory ?");
             return DONT_ENOUGH_MEMORY;
         }
     }
@@ -99,7 +98,7 @@ int main(void){
         free(rows);
         for(int j = 0; j < n; j++)free(columns[j]);
         free(columns);
-        printf("Can't create array. Don't enough memory ?");
+        printf("Can't create array. Not enough memory ?");
         return DONT_ENOUGH_MEMORY;
     }
     for(int i = 0; i < n; i++){
@@ -113,7 +112,7 @@ int main(void){
             free(columns);
             for(int j = 0; j != i; j++)free(boxes[j]);
             free(boxes);
-            printf("Can't create array. Don't enough memory ?");
+            printf("Can't create array. Not enough memory ?");
             return DONT_ENOUGH_MEMORY;
         }
     }
@@ -136,12 +135,12 @@ int main(void){
             if(curVal == '\n' || curVal == '\t' || curVal == ' ') {}
                 // неверный ввод
             else {
-                fprintf(fl_out,"Incorrectly input");
+                printf("Incorrect input data");
                 return 0;
             }
             while(fscanf(fl_in, "%c", &curVal) != EOF){
                 if(curVal == '\n' || curVal == '\t' || curVal == ' ') continue;
-                fprintf(fl_out,"Incorrectly input");
+                printf("Incorrect input data");
                 return 0;
             }
             fseek(fl_in,1,SEEK_CUR);
@@ -158,7 +157,7 @@ int main(void){
                 continue;
             }
             else{
-                fprintf(fl_out,"Incorrectly input");
+                printf("Incorrect input data");
                 return 0;
             }
         }
@@ -184,7 +183,7 @@ int main(void){
             boxes[box_ind][n] ++; // увеличиваем количество заполненных ячеек в квадрате
         }
         else if (curVal != '.'){
-            fprintf(fl_out,"Incorrectly input");
+            printf("Incorrect input data");
             return 0;
         }
         j++;
@@ -193,7 +192,7 @@ int main(void){
     for(int k = 0; k < n; k++ ){
         for(int l = 0; l < n; l++){
             if(boxes[k][l] > 1 || rows[k][l] > 1 || columns[k][l] > 1){
-                fprintf(fl_out,"Incorrectly input");
+                printf("Incorrect input data");
                 return 0;
             }
         }
@@ -202,21 +201,21 @@ int main(void){
     // если нет решений
     int res = sudoku_solver(matrix, rows, columns, boxes);
     if(res == NO_SOLUTIONS){
-        fprintf(fl_out,"Sudoku has no solutions\n\n");
+        printf("No solutions\n\n");
         return 0;
     }
         // если на входе дана уже решенная судоку
     else if ( res == SUDOKU_ALREADY_SOLVED){
-        fprintf(fl_out,"Sudoku has already been solved");
+        printf("This sudoku already solved");
         return 0;
     }
     // вывод решенного судоку
     for(int k = 0; k < n; k++){
         for(int l = 0; l < n; l++){
-            fprintf(fl_out,"%d",matrix[k][l]);
+                printf("%d",matrix[k][l]);
         }
         if(k == 8) break;
-        fprintf(fl_out,"\n");
+            printf("\n");
     }
     //освобождение памяти
     for(int k = 0; k < n; k ++){
@@ -231,7 +230,6 @@ int main(void){
     free(boxes);
 
     fclose(fl_in);
-    fclose(fl_out);
     return 0;
 }
 
