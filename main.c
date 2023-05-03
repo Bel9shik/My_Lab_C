@@ -5,22 +5,22 @@
 
 enum SudokuResults{
     NO_SOLUTIONS, // 0
-    OK, // 1
-    SUDOKU_ALREADY_SOLVED, // 2
-    INCORRECTLY_INPUT, // 3
-    FILE_ACCESS_ERROR, //4
-    DONT_ENOUGH_MEMORY //5
+    OK, // 0
+    SUDOKU_ALREADY_SOLVED, // 0
+    INCORRECTLY_INPUT, // 1
+    FILE_ACCESS_ERROR, // 2
+    DONT_ENOUGH_MEMORY // 3
 };
 
 int sudoku_solver (int** matrix, int** rows, int** columns, int** boxes);
 int main(void){
 
-    FILE *fl_in = fopen("input.txt", "r");
+    FILE *fl_in = fopen("in.txt", "r");
     if(fl_in == NULL){
         fprintf(stderr, "FILE CONNECTION ERROR\n");
         return FILE_ACCESS_ERROR;
     }
-    FILE *fl_out = fopen("output.txt", "w+");
+    FILE *fl_out = fopen("out.txt", "w+");
     fseek(fl_in, 0 , SEEK_END);
     long poss = ftell(fl_in);
     // если файл пустой
@@ -29,7 +29,7 @@ int main(void){
         return FILE_ACCESS_ERROR;
     }
     fseek(fl_in, 0, SEEK_SET); // восстановление указателя на начало файла
-    
+
     int** matrix = calloc(n, sizeof(int *));
     if(matrix == NULL){
         free(matrix);
@@ -122,117 +122,117 @@ int main(void){
     char curVal = '\n';
     int curNum;
     // считывание всех '\n' (сделано, для того, чтобы не было проблем с вводом данных)
-        while (curVal == '\n') {
-            fscanf(fl_in, "%c", &curVal);
-        }
+    while (curVal == '\n') {
+        fscanf(fl_in, "%c", &curVal);
+    }
     //в последний раз сработал while и указатель сместился на символ правее, поэтому эта строка нужна, чтобы вернуть указатель на нужное место
-        fseek(fl_in, -1, SEEK_CUR);
-        int i = 0, j = 0;
+    fseek(fl_in, -1, SEEK_CUR);
+    int i = 0, j = 0;
     // проходимся по матрице
-        while(fscanf(fl_in, "%c", &curVal) != EOF){
-            // проверка, что строк не больше 9
-            if(i == n){
-                //обработка ввода после 9 строки в input.txt(если это не '\t' или '\n' или ' ', то
-                if(curVal == '\n' || curVal == '\t' || curVal == ' ') {}
+    while(fscanf(fl_in, "%c", &curVal) != EOF){
+        // проверка, что строк не больше 9
+        if(i == n){
+            //обработка ввода после 9 строки в input.txt(если это не '\t' или '\n' или ' ', то
+            if(curVal == '\n' || curVal == '\t' || curVal == ' ') {}
                 // неверный ввод
-                else {
-                    fprintf(fl_out,"Incorrectly input");
-                    return INCORRECTLY_INPUT;
-                }
-                while(fscanf(fl_in, "%c", &curVal) != EOF){
-                    if(curVal == '\n' || curVal == '\t' || curVal == ' ') continue;
-                    fprintf(fl_out,"Incorrectly input");
-                    return INCORRECTLY_INPUT;
-                }
-                fseek(fl_in,1,SEEK_CUR);
-                if(!feof(fl_in)){
-                    break;
-                }
-            }
-
-            // переход на новую строку
-            if(curVal == '\n'){
-                if(j == n){
-                    i ++;
-                    j = 0;
-                    continue;
-                }
-                else{
-                    fprintf(fl_out,"Incorrectly input");
-                    return INCORRECTLY_INPUT;
-                }
-            }
-            // если считано число
-            if(curVal != '.' && (curVal - '0') > 0 && (curVal - '0') < 10){
-                curNum = curVal - '0';
-                matrix[i][j] = curNum; //запись числа в таблицу
-                rows[i][curNum - 1] ++; // показываем, что такое число есть в этой строке
-                rows[i][n] ++;// увеличиваем количество заполненных ячеек в строке
-                columns[j][curNum - 1] ++;// показываем, что такое число есть в этом столбце
-                columns[j][n] ++; // увеличиваем количество заполненных ячеек в столбце
-                int box_ind; //if's снизу для того, чтобы понять в каком квадрате мы находимся (поле поделено на 9 квадратов)
-                if(i <= 2 && j <= 2) box_ind = 0;
-                else if(i <= 2 && j >= 3 && j <= 5) box_ind = 1;
-                else if(i <= 2 && j >= 6) box_ind = 2;
-                else if(i >= 3 && i <= 5 && j <= 2) box_ind = 3;
-                else if(i >= 3 && i <= 5 &&  j >= 3 && j <= 5) box_ind = 4;
-                else if(i >= 3 && i <= 5 && j >= 6) box_ind = 5;
-                else if(i >= 6 && j <= 2) box_ind = 6;
-                else if(i >= 6 && j >= 3 && j <= 5) box_ind = 7;
-                else box_ind = 8;
-                boxes[box_ind][curNum - 1] ++;// показываем, что такое число есть в этом квадрате
-                boxes[box_ind][n] ++; // увеличиваем количество заполненных ячеек в квадрате
-            }
-            else if (curVal != '.'){
+            else {
                 fprintf(fl_out,"Incorrectly input");
-                return INCORRECTLY_INPUT;
+                return 0;
             }
-            j++;
+            while(fscanf(fl_in, "%c", &curVal) != EOF){
+                if(curVal == '\n' || curVal == '\t' || curVal == ' ') continue;
+                fprintf(fl_out,"Incorrectly input");
+                return 0;
+            }
+            fseek(fl_in,1,SEEK_CUR);
+            if(!feof(fl_in)){
+                break;
+            }
         }
+
+        // переход на новую строку
+        if(curVal == '\n'){
+            if(j == n){
+                i ++;
+                j = 0;
+                continue;
+            }
+            else{
+                fprintf(fl_out,"Incorrectly input");
+                return 0;
+            }
+        }
+        // если считано число
+        if(curVal != '.' && (curVal - '0') > 0 && (curVal - '0') < 10){
+            curNum = curVal - '0';
+            matrix[i][j] = curNum; //запись числа в таблицу
+            rows[i][curNum - 1] ++; // показываем, что такое число есть в этой строке
+            rows[i][n] ++;// увеличиваем количество заполненных ячеек в строке
+            columns[j][curNum - 1] ++;// показываем, что такое число есть в этом столбце
+            columns[j][n] ++; // увеличиваем количество заполненных ячеек в столбце
+            int box_ind; //if's снизу для того, чтобы понять в каком квадрате мы находимся (поле поделено на 9 квадратов)
+            if(i <= 2 && j <= 2) box_ind = 0;
+            else if(i <= 2 && j >= 3 && j <= 5) box_ind = 1;
+            else if(i <= 2 && j >= 6) box_ind = 2;
+            else if(i >= 3 && i <= 5 && j <= 2) box_ind = 3;
+            else if(i >= 3 && i <= 5 &&  j >= 3 && j <= 5) box_ind = 4;
+            else if(i >= 3 && i <= 5 && j >= 6) box_ind = 5;
+            else if(i >= 6 && j <= 2) box_ind = 6;
+            else if(i >= 6 && j >= 3 && j <= 5) box_ind = 7;
+            else box_ind = 8;
+            boxes[box_ind][curNum - 1] ++;// показываем, что такое число есть в этом квадрате
+            boxes[box_ind][n] ++; // увеличиваем количество заполненных ячеек в квадрате
+        }
+        else if (curVal != '.'){
+            fprintf(fl_out,"Incorrectly input");
+            return 0;
+        }
+        j++;
+    }
     //проверка на одинаковые числа в строках / столбцах / квадратах
-        for(int k = 0; k < n; k++ ){
-            for(int l = 0; l < n; l++){
-                if(boxes[k][l] > 1 || rows[k][l] > 1 || columns[k][l] > 1){
-                    fprintf(fl_out,"Incorrectly input");
-                    return INCORRECTLY_INPUT;
-                }
+    for(int k = 0; k < n; k++ ){
+        for(int l = 0; l < n; l++){
+            if(boxes[k][l] > 1 || rows[k][l] > 1 || columns[k][l] > 1){
+                fprintf(fl_out,"Incorrectly input");
+                return 0;
             }
         }
-    
-        // если нет решений
-        int res = sudoku_solver(matrix, rows, columns, boxes);
-        if(res == NO_SOLUTIONS){
-            fprintf(fl_out,"Sudoku has no solutions\n\n");
-            return NO_SOLUTIONS;
-        }
+    }
+
+    // если нет решений
+    int res = sudoku_solver(matrix, rows, columns, boxes);
+    if(res == NO_SOLUTIONS){
+        fprintf(fl_out,"Sudoku has no solutions\n\n");
+        return 0;
+    }
         // если на входе дана уже решенная судоку
-        else if ( res == SUDOKU_ALREADY_SOLVED){
-            fprintf(fl_out,"Sudoku has already been solved");
-            return SUDOKU_ALREADY_SOLVED;
+    else if ( res == SUDOKU_ALREADY_SOLVED){
+        fprintf(fl_out,"Sudoku has already been solved");
+        return 0;
+    }
+    // вывод решенного судоку
+    for(int k = 0; k < n; k++){
+        for(int l = 0; l < n; l++){
+            fprintf(fl_out,"%d",matrix[k][l]);
         }
-        // вывод решенного судоку
-        for(int k = 0; k < n; k++){
-            for(int l = 0; l < n; l++){
-                fprintf(fl_out,"%d",matrix[k][l]);
-            }
-            if(k == 8) break;
-            fprintf(fl_out,"\n");
-        }
-        //освобождение памяти
-        for(int k = 0; k < n; k ++){
-            free(rows[k]);
-            free(columns[k]);
-            free(boxes[k]);
-            free(matrix[k]);
-        }
-        free(matrix);
-        free(rows);
-        free(columns);
-        free(boxes);
+        if(k == 8) break;
+        fprintf(fl_out,"\n");
+    }
+    //освобождение памяти
+    for(int k = 0; k < n; k ++){
+        free(rows[k]);
+        free(columns[k]);
+        free(boxes[k]);
+        free(matrix[k]);
+    }
+    free(matrix);
+    free(rows);
+    free(columns);
+    free(boxes);
 
     fclose(fl_in);
     fclose(fl_out);
-    return OK;
+    return 0;
 }
 
 int sudoku_solver (int** matrix, int** rows, int** columns, int** boxes){
