@@ -201,7 +201,7 @@ int main(void){
     // если нет решений
     int res = sudoku_solver(matrix, rows, columns, boxes);
     if(res == NO_SOLUTIONS){
-        printf("No solutions\n\n");
+        printf("No solutions");
         return 0;
     }
         // если на входе дана уже решенная судоку
@@ -212,10 +212,10 @@ int main(void){
     // вывод решенного судоку
     for(int k = 0; k < n; k++){
         for(int l = 0; l < n; l++){
-                printf("%d",matrix[k][l]);
+            printf("%d",matrix[k][l]);
         }
         if(k == 8) break;
-            printf("\n");
+        printf("\n");
     }
     //освобождение памяти
     for(int k = 0; k < n; k ++){

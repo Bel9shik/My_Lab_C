@@ -5,13 +5,12 @@
 и их нельзя менять.
 Выходные данные:
 Поле судоку, если существует решение, иначе "Sudoku has no solutions". 
-Если неверный ввод - "Incorrectly input". 
-Если судоку уже решено - "Sudoku has already been solved".
+Если неверный ввод - "Incorrect input data".
+Если судоку уже решено - "This sudoku already solved".
 Если файл пустой - "File is empty".
 
 Пример:
 Вход:
-
 
 ..3.2.6..
 9..3.5..1
@@ -52,8 +51,7 @@
 
 Выход:
 
-
-Incorrectly input
+Incorrect input data
 
 Пример 3:
 
@@ -71,5 +69,5 @@ Incorrectly input
 
 Выход:
 
-Sudoku has already been solved
+This sudoku already solved
 
