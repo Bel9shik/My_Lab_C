@@ -165,10 +165,10 @@ int main(void){
         if (curVal != '.' && (curVal - '0') > 0 && (curVal - '0') < 10) {
             curNum = curVal - '0';
             matrix[i][j] = curNum; //запись числа в таблицу
-            rows[i][curNum - 1] ++; // показываем, что такое число есть в этой строке
-            rows[i][n] ++;// увеличиваем количество заполненных ячеек в строке
-            columns[j][curNum - 1] ++;// показываем, что такое число есть в этом столбце
-            columns[j][n] ++; // увеличиваем количество заполненных ячеек в столбце
+            rows[i][curNum - 1]++; // показываем, что такое число есть в этой строке
+            rows[i][n]++;// увеличиваем количество заполненных ячеек в строке
+            columns[j][curNum - 1]++;// показываем, что такое число есть в этом столбце
+            columns[j][n]++; // увеличиваем количество заполненных ячеек в столбце
             int box_ind; //if's снизу для того, чтобы понять в каком квадрате мы находимся (поле поделено на 9 квадратов)
             if (i <= 2 && j <= 2) box_ind = 0;
             else if (i <= 2 && j >= 3 && j <= 5) box_ind = 1;
@@ -179,8 +179,8 @@ int main(void){
             else if (i >= 6 && j <= 2) box_ind = 6;
             else if (i >= 6 && j >= 3 && j <= 5) box_ind = 7;
             else box_ind = 8;
-            boxes[box_ind][curNum - 1] ++;// показываем, что такое число есть в этом квадрате
-            boxes[box_ind][n] ++; // увеличиваем количество заполненных ячеек в квадрате
+            boxes[box_ind][curNum - 1]++;// показываем, что такое число есть в этом квадрате
+            boxes[box_ind][n]++; // увеличиваем количество заполненных ячеек в квадрате
         } else if (curVal != '.'){
             printf("Incorrect input data");
             return 0;
@@ -217,7 +217,7 @@ int main(void){
         printf("\n");
     }
     //освобождение памяти
-    for (int k = 0; k < n; k ++) {
+    for (int k = 0; k < n; k++) {
         free(rows[k]);
         free(columns[k]);
         free(boxes[k]);
@@ -377,15 +377,15 @@ int sudoku_solver(int** matrix, int** rows, int** columns, int** boxes){
         // если этого числа нет в строке, столбце и квадрате
         if (boxes[box_index][i] == 0 && rows[mainI][i] == 0 && columns[mainJ][i] == 0) {
             matrix[mainI][mainJ] = i + 1;
-            columns[mainJ][n] ++;
+            columns[mainJ][n]++;
             boxes[box_index][i]  = 1;
-            boxes[box_index][n] ++;
+            boxes[box_index][n]++;
             //выход из рекурсии, если у нас заполнены все ячейки
             if (total_filled_cells == 80) {
                 return OK;
             }
             rows[mainI][i] = 1;
-            rows[mainI][n] ++;
+            rows[mainI][n]++;
             columns[mainJ][i] = 1;
             int result = sudoku_solver(matrix, rows, columns, boxes);
             if (result) {
@@ -394,11 +394,11 @@ int sudoku_solver(int** matrix, int** rows, int** columns, int** boxes){
             //если это число не подошло, то восстанавливаем то, что было без этого числа
             matrix[mainI][mainJ] = 0;
             rows[mainI][i] = 0;
-            rows[mainI][n] --;
+            rows[mainI][n]--;
             columns[mainJ][i] = 0;
-            columns[mainJ][n] --;
+            columns[mainJ][n]--;
             boxes[box_index][i]  = 0;
-            boxes[box_index][n] --;
+            boxes[box_index][n]--;
         }
     }
     return NO_SOLUTIONS;
