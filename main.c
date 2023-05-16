@@ -4,41 +4,42 @@
 #define n 9
 
 enum SudokuResults{
-    NO_SOLUTIONS, // 0
-    OK, // 0
-    SUDOKU_ALREADY_SOLVED, // 0
-    INCORRECTLY_INPUT, // 1
-    FILE_ACCESS_ERROR, // 2
-    DONT_ENOUGH_MEMORY // 3
+    NO_SOLUTIONS,
+    OK,
+    SUDOKU_ALREADY_SOLVED,
+    INCORRECTLY_INPUT,
+    FILE_ACCESS_ERROR,
+    DONT_ENOUGH_MEMORY
 };
 
-int sudoku_solver (int** matrix, int** rows, int** columns, int** boxes);
+int sudoku_solver(int** matrix, int** rows, int** columns, int** boxes);
+
 int main(void){
 
     FILE *fl_in = fopen("in.txt", "r");
     if(fl_in == NULL){
-        printf( "FILE CONNECTION ERROR\n");
+        printf("FILE CONNECTION ERROR\n");
         return FILE_ACCESS_ERROR;
     }
-    fseek(fl_in, 0 , SEEK_END);
+    fseek(fl_in, 0 ,SEEK_END);
     long poss = ftell(fl_in);
     // если файл пустой
-    if(poss == 0){
+    if (poss == 0){
         printf("File is empty");
         return FILE_ACCESS_ERROR;
     }
     fseek(fl_in, 0, SEEK_SET); // восстановление указателя на начало файла
 
     int** matrix = calloc(n, sizeof(int *));
-    if(matrix == NULL){
+    if (matrix == NULL) {
         free(matrix);
         printf("Can't create the array. Not enough memory ?");
         return DONT_ENOUGH_MEMORY;
     }
-    for(int i = 0; i < n; i++){
+    for (int i = 0; i < n; i++) {
         matrix[i] = calloc(n, sizeof(int));
-        if(matrix[i] == NULL){
-            for(int j = 0; j != i; j++)free(matrix[j]);
+        if (matrix[i] == NULL) {
+            for (int j = 0; j != i; j++) free(matrix[j]);
             free(matrix);
             printf("Can't create array. Not enough memory ?");
             return DONT_ENOUGH_MEMORY;
@@ -46,19 +47,19 @@ int main(void){
     }
 
     int** rows = calloc(n, sizeof(int *));
-    if(rows == NULL){
+    if (rows == NULL) {
         free(rows);
-        for(int k = 0; k < n; k++)free(matrix[k]);
+        for (int k = 0; k < n; k++) free(matrix[k]);
         free(matrix);
         printf("Can't create array. Not enough memory ?");
         return DONT_ENOUGH_MEMORY;
     }
-    for(int i = 0; i < n; i++){
+    for (int i = 0; i < n; i++) {
         rows[i] = calloc(n + 1, sizeof(int));
-        if(rows[i] == NULL){
-            for(int k = 0; k < n; k++)free(matrix[k]);
+        if (rows[i] == NULL) {
+            for (int k = 0; k < n; k++) free(matrix[k]);
             free(matrix);
-            for(int j = 0; j != i; j++)free(rows[j]);
+            for (int j = 0; j != i; j++) free(rows[j]);
             free(rows);
             printf("Can't create array. Not enough memory ?");
             return DONT_ENOUGH_MEMORY;
@@ -66,11 +67,11 @@ int main(void){
     }
 
     int** columns = calloc(n, sizeof(int *));
-    if(columns == NULL){
+    if (columns == NULL) {
         free(columns);
-        for(int k = 0; k < n; k++)free(matrix[k]);
+        for (int k = 0; k < n; k++) free(matrix[k]);
         free(matrix);
-        for(int j = 0; j < n ; j++)free(rows[j]);
+        for (int j = 0; j < n ; j++) free(rows[j]);
         free(rows);
         printf("Can't create array. Not enough memory ?");
         return DONT_ENOUGH_MEMORY;
@@ -78,11 +79,11 @@ int main(void){
     for(int i = 0; i < n; i++){
         columns[i] = calloc(n + 1, sizeof(int));
         if(columns[i] == NULL){
-            for(int k = 0; k < n; k++)free(matrix[k]);
+            for (int k = 0; k < n; k++) free(matrix[k]);
             free(matrix);
-            for(int j = 0; j < n; j++)free(rows[j]);
+            for (int j = 0; j < n; j++) free(rows[j]);
             free(rows);
-            for(int j = 0; j != i; j++)free(columns[j]);
+            for (int j = 0; j != i; j++) free(columns[j]);
             free(columns);
             printf("Can't create array. Not enough memory ?");
             return DONT_ENOUGH_MEMORY;
@@ -92,25 +93,25 @@ int main(void){
     int** boxes = calloc(n, sizeof(int *));
     if(boxes == NULL){
         free(boxes);
-        for(int k = 0; k < n; k++)free(matrix[k]);
+        for (int k = 0; k < n; k++) free(matrix[k]);
         free(matrix);
-        for(int j = 0; j < n; j++)free(rows[j]);
+        for (int j = 0; j < n; j++) free(rows[j]);
         free(rows);
-        for(int j = 0; j < n; j++)free(columns[j]);
+        for (int j = 0; j < n; j++) free(columns[j]);
         free(columns);
         printf("Can't create array. Not enough memory ?");
         return DONT_ENOUGH_MEMORY;
     }
-    for(int i = 0; i < n; i++){
+    for (int i = 0; i < n; i++) {
         boxes[i] = calloc(n + 1, sizeof(int));
-        if(boxes[i] == NULL){
-            for(int k = 0; k < n; k++)free(matrix[k]);
+        if (boxes[i] == NULL) {
+            for (int k = 0; k < n; k++) free(matrix[k]);
             free(matrix);
-            for(int j = 0; j < n; j++)free(rows[j]);
+            for (int j = 0; j < n; j++) free(rows[j]);
             free(rows);
-            for(int j = 0; j < n; j++)free(columns[j]);
+            for (int j = 0; j < n; j++) free(columns[j]);
             free(columns);
-            for(int j = 0; j != i; j++)free(boxes[j]);
+            for (int j = 0; j != i; j++) free(boxes[j]);
             free(boxes);
             printf("Can't create array. Not enough memory ?");
             return DONT_ENOUGH_MEMORY;
@@ -128,41 +129,40 @@ int main(void){
     fseek(fl_in, -1, SEEK_CUR);
     int i = 0, j = 0;
     // проходимся по матрице
-    while(fscanf(fl_in, "%c", &curVal) != EOF){
+    while (fscanf(fl_in, "%c", &curVal) != EOF) {
         // проверка, что строк не больше 9
-        if(i == n){
+        if (i == n) {
             //обработка ввода после 9 строки в input.txt(если это не '\t' или '\n' или ' ', то
-            if(curVal == '\n' || curVal == '\t' || curVal == ' ') {}
+            if (curVal == '\n' || curVal == '\t' || curVal == ' ') {}
                 // неверный ввод
             else {
                 printf("Incorrect input data");
                 return 0;
             }
-            while(fscanf(fl_in, "%c", &curVal) != EOF){
-                if(curVal == '\n' || curVal == '\t' || curVal == ' ') continue;
+            while (fscanf(fl_in, "%c", &curVal) != EOF) {
+                if (curVal == '\n' || curVal == '\t' || curVal == ' ') continue;
                 printf("Incorrect input data");
                 return 0;
             }
             fseek(fl_in,1,SEEK_CUR);
-            if(!feof(fl_in)){
+            if (!feof(fl_in)) {
                 break;
             }
         }
 
         // переход на новую строку
-        if(curVal == '\n'){
-            if(j == n){
+        if (curVal == '\n') {
+            if (j == n) {
                 i ++;
                 j = 0;
                 continue;
-            }
-            else{
+            } else {
                 printf("Incorrect input data");
                 return 0;
             }
         }
         // если считано число
-        if(curVal != '.' && (curVal - '0') > 0 && (curVal - '0') < 10){
+        if (curVal != '.' && (curVal - '0') > 0 && (curVal - '0') < 10) {
             curNum = curVal - '0';
             matrix[i][j] = curNum; //запись числа в таблицу
             rows[i][curNum - 1] ++; // показываем, что такое число есть в этой строке
@@ -170,28 +170,27 @@ int main(void){
             columns[j][curNum - 1] ++;// показываем, что такое число есть в этом столбце
             columns[j][n] ++; // увеличиваем количество заполненных ячеек в столбце
             int box_ind; //if's снизу для того, чтобы понять в каком квадрате мы находимся (поле поделено на 9 квадратов)
-            if(i <= 2 && j <= 2) box_ind = 0;
-            else if(i <= 2 && j >= 3 && j <= 5) box_ind = 1;
-            else if(i <= 2 && j >= 6) box_ind = 2;
-            else if(i >= 3 && i <= 5 && j <= 2) box_ind = 3;
-            else if(i >= 3 && i <= 5 &&  j >= 3 && j <= 5) box_ind = 4;
-            else if(i >= 3 && i <= 5 && j >= 6) box_ind = 5;
-            else if(i >= 6 && j <= 2) box_ind = 6;
-            else if(i >= 6 && j >= 3 && j <= 5) box_ind = 7;
+            if (i <= 2 && j <= 2) box_ind = 0;
+            else if (i <= 2 && j >= 3 && j <= 5) box_ind = 1;
+            else if (i <= 2 && j >= 6) box_ind = 2;
+            else if (i >= 3 && i <= 5 && j <= 2) box_ind = 3;
+            else if (i >= 3 && i <= 5 &&  j >= 3 && j <= 5) box_ind = 4;
+            else if (i >= 3 && i <= 5 && j >= 6) box_ind = 5;
+            else if (i >= 6 && j <= 2) box_ind = 6;
+            else if (i >= 6 && j >= 3 && j <= 5) box_ind = 7;
             else box_ind = 8;
             boxes[box_ind][curNum - 1] ++;// показываем, что такое число есть в этом квадрате
             boxes[box_ind][n] ++; // увеличиваем количество заполненных ячеек в квадрате
-        }
-        else if (curVal != '.'){
+        } else if (curVal != '.'){
             printf("Incorrect input data");
             return 0;
         }
         j++;
     }
     //проверка на одинаковые числа в строках / столбцах / квадратах
-    for(int k = 0; k < n; k++ ){
-        for(int l = 0; l < n; l++){
-            if(boxes[k][l] > 1 || rows[k][l] > 1 || columns[k][l] > 1){
+    for (int k = 0; k < n; k++) {
+        for (int l = 0; l < n; l++) {
+            if (boxes[k][l] > 1 || rows[k][l] > 1 || columns[k][l] > 1) {
                 printf("Incorrect input data");
                 return 0;
             }
@@ -200,25 +199,25 @@ int main(void){
 
     // если нет решений
     int res = sudoku_solver(matrix, rows, columns, boxes);
-    if(res == NO_SOLUTIONS){
+    if (res == NO_SOLUTIONS) {
         printf("No solutions");
         return 0;
     }
         // если на входе дана уже решенная судоку
-    else if ( res == SUDOKU_ALREADY_SOLVED){
+    else if (res == SUDOKU_ALREADY_SOLVED) {
         printf("This sudoku already solved");
         return 0;
     }
     // вывод решенного судоку
-    for(int k = 0; k < n; k++){
-        for(int l = 0; l < n; l++){
+    for (int k = 0; k < n; k++) {
+        for (int l = 0; l < n; l++) {
             printf("%d",matrix[k][l]);
         }
-        if(k == 8) break;
+        if (k == 8) break;
         printf("\n");
     }
     //освобождение памяти
-    for(int k = 0; k < n; k ++){
+    for (int k = 0; k < n; k ++) {
         free(rows[k]);
         free(columns[k]);
         free(boxes[k]);
@@ -233,7 +232,8 @@ int main(void){
     return 0;
 }
 
-int sudoku_solver (int** matrix, int** rows, int** columns, int** boxes){
+
+int sudoku_solver(int** matrix, int** rows, int** columns, int** boxes){
     int tmp_maxSum = -10, type  = 0, maxIndex = -10, total_filled_cells = 0;
 /* tmp_maxSum - переменная для того, чтобы понять максимальное количество заполненных ячеек (меньше 9)
  * type  - переменная для того, чтобы понять где больше всего заполнено ячеек (в строке, в столбце или в квадрате)
@@ -241,19 +241,19 @@ int sudoku_solver (int** matrix, int** rows, int** columns, int** boxes){
  * total_filled_cells - количество заполненных ячеек     */
 
     // поиск tmp_maxSum, type и maxIndex
-    for(int i = 0; i < n; i ++){
+    for (int i = 0; i < n; i++) {
         total_filled_cells += boxes[i][n]; // считаем, сколько ячеек заполнено в таблице, если будет 80, то это последняя итерация
-        if(boxes[i][n] > tmp_maxSum && boxes[i][n] < n){
+        if (boxes[i][n] > tmp_maxSum && boxes[i][n] < n) {
             type = 1;
             maxIndex = i;
             tmp_maxSum = boxes[i][n];
         }
-        if(rows[i][n] > tmp_maxSum && rows[i][n] < n){
+        if (rows[i][n] > tmp_maxSum && rows[i][n] < n) {
             type = 2;
             maxIndex= i;
             tmp_maxSum = rows[i][n];
         }
-        if(columns[i][n] > tmp_maxSum && columns[i][n] < n){
+        if (columns[i][n] > tmp_maxSum && columns[i][n] < n) {
             type = 3;
             maxIndex = i;
             tmp_maxSum = columns[i][n];
@@ -261,7 +261,7 @@ int sudoku_solver (int** matrix, int** rows, int** columns, int** boxes){
     }
 
     // если судоку уже решено
-    if(total_filled_cells == 81) return SUDOKU_ALREADY_SOLVED;
+    if (total_filled_cells == 81) return SUDOKU_ALREADY_SOLVED;
 
 /*
  * mainI и mainJ - индексы строки и столбца соответственно, в которых заполнено больше всего ячеек
@@ -271,8 +271,7 @@ int sudoku_solver (int** matrix, int** rows, int** columns, int** boxes){
     int mainI = 0, mainJ = 0, maxSum = 0;
 
     // в зависимости от объекта(строка, столбец или квадрат) выбираем где проверять
-    switch(type)
-    {
+    switch (type) {
         //если это квадрат, то записываем в tmp_I и tmp_J левую верхнюю точку нужного нам квадрата
         case 1: {
             int tmp_I, tmp_J;
@@ -315,12 +314,12 @@ int sudoku_solver (int** matrix, int** rows, int** columns, int** boxes){
                     break;
             }
             //проходимся по этому квадрату и ищем клетку, в которой строке и столбце больше всего чисел уже заполнено
-            for(int i = tmp_I; i < tmp_I + 3; i++){
-                for(int j = tmp_J; j < tmp_J + 3; j++){
+            for (int i = tmp_I; i < tmp_I + 3; i++) {
+                for (int j = tmp_J; j < tmp_J + 3; j++) {
                     // если в этой ячейке нет числа
-                    if(matrix[i][j] == 0){
+                    if (matrix[i][j] == 0) {
                         // если в этой строке и стобце наибольшее число заполненных клеток
-                        if(rows[i][n] + columns[j][n] > maxSum){
+                        if (rows[i][n] + columns[j][n] > maxSum) {
                             mainI = i;
                             mainJ = j;
                             maxSum = rows[i][n] + columns[j][n];
@@ -363,33 +362,33 @@ int sudoku_solver (int** matrix, int** rows, int** columns, int** boxes){
 
     //индекс нужного квадрата
     int box_index;
-    if(mainI <= 2 && mainJ <= 2) box_index = 0;
+    if (mainI <= 2 && mainJ <= 2) box_index = 0;
     else if (mainI <= 2 && mainJ >= 3 && mainJ <= 5) box_index = 1;
-    else if(mainI <= 2 && mainJ >= 6) box_index = 2;
-    else if(mainI >= 3 && mainI <= 5 && mainJ <= 2) box_index = 3;
+    else if (mainI <= 2 && mainJ >= 6) box_index = 2;
+    else if (mainI >= 3 && mainI <= 5 && mainJ <= 2) box_index = 3;
     else if (mainI >= 3 && mainI <= 5 && mainJ >= 3 && mainJ <= 5) box_index = 4;
-    else if(mainI >= 3 && mainI <= 5 && mainJ >= 6) box_index = 5;
-    else if(mainI >= 6 && mainJ <= 2) box_index = 6;
+    else if (mainI >= 3 && mainI <= 5 && mainJ >= 6) box_index = 5;
+    else if (mainI >= 6 && mainJ <= 2) box_index = 6;
     else if (mainI >= 6 && mainJ >= 3 && mainJ <= 5) box_index = 7;
     else box_index = 8;
 
     // ищем число, которое можно вставить
-    for(int i = 0; i < n; i++){
+    for (int i = 0; i < n; i++) {
         // если этого числа нет в строке, столбце и квадрате
-        if(boxes[box_index][i] == 0 && rows[mainI][i] == 0 && columns[mainJ][i] == 0){
+        if (boxes[box_index][i] == 0 && rows[mainI][i] == 0 && columns[mainJ][i] == 0) {
             matrix[mainI][mainJ] = i + 1;
             columns[mainJ][n] ++;
             boxes[box_index][i]  = 1;
             boxes[box_index][n] ++;
             //выход из рекурсии, если у нас заполнены все ячейки
-            if(total_filled_cells == 80){
+            if (total_filled_cells == 80) {
                 return OK;
             }
             rows[mainI][i] = 1;
             rows[mainI][n] ++;
             columns[mainJ][i] = 1;
             int result = sudoku_solver(matrix, rows, columns, boxes);
-            if(result){
+            if (result) {
                 return OK;
             }
             //если это число не подошло, то восстанавливаем то, что было без этого числа
