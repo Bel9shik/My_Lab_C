@@ -13,6 +13,8 @@ enum SudokuResults{
 };
 
 int sudoku_solver(int** matrix, int** rows, int** columns, int** boxes);
+int count_solve(int i, int j, int** matrix, int count);
+int legal(int i, int j, int val, int** matrix);
 
 int main(void){
 
@@ -195,6 +197,14 @@ int main(void){
                 return 0;
             }
         }
+    }
+    //проверка на количество решений
+    int count = 0;
+    i = 0, j = 0;
+    int count_solutions = count_solve(i,j,matrix,count);
+    if (count_solutions == 2) {
+        printf("Sudoku has more 1 solution");
+        return 0;
     }
 
     // если нет решений
@@ -402,4 +412,50 @@ int sudoku_solver(int** matrix, int** rows, int** columns, int** boxes){
         }
     }
     return NO_SOLUTIONS;
+}
+
+int count_solve(int i, int j, int** matrix, int count){
+
+    if (i == n){
+        i = 0;
+        if (++j == n) {
+            return count + 1;
+        }
+    }
+    //пропускаем пустые ячейки
+    if (matrix[i][j] != 0) return count_solve(i + 1, j, matrix, count);
+    //ищем два решения
+    //выходим из цикла, если найдём 2 решения
+    for (int val = 1; val <= 9 && count < 2; val++) {
+        if (legal(i, j, val, matrix)) {
+            matrix[i][j] = val;
+            count = count_solve(i + 1, j, matrix, count);
+        }
+    }
+    matrix[i][j] = 0; // восставниваем ячейку
+    return count;
+}
+
+int legal(int i, int j, int val, int** matrix){
+    //проверяем строку
+    for (int k = 0; k < n; k++) {
+        if (matrix[i][k] == val) return 0;
+    }
+
+    //проверяем столбец
+    for (int k = 0; k < n; k++) {
+        if (matrix[k][j] == val) return 0;
+    }
+
+    //проверяем квадрант
+    int tmp_I = (i / 3) * 3;
+    int tmp_J = (j / 3) * 3;
+
+    for (int k = 0; k < 3; k++) {
+        for (int l = 0; l < 3; l++) {
+            if (matrix[tmp_I + k][tmp_J + l] == val) return 0;
+        }
+    }
+
+    return 1;
 }
