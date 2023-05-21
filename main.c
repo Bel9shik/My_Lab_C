@@ -126,6 +126,21 @@ int main(void){
     // считывание всех '\n' (сделано, для того, чтобы не было проблем с вводом данных)
     while (curVal == '\n') {
         fscanf(fl_in, "%c", &curVal);
+        if(feof(fl_in)){
+            printf("Incorrect input data");
+            fclose(fl_in);
+            for (int k = 0; k < n; k++) {
+                free(rows[k]);
+                free(columns[k]);
+                free(boxes[k]);
+                free(matrix[k]);
+            }
+            free(matrix);
+            free(rows);
+            free(columns);
+            free(boxes);
+            return 0;
+        }
     }
     //в последний раз сработал while и указатель сместился на символ правее, поэтому эта строка нужна, чтобы вернуть указатель на нужное место
     fseek(fl_in, -1, SEEK_CUR);
@@ -203,7 +218,7 @@ int main(void){
     i = 0, j = 0;
     int count_solutions = count_solve(i,j,matrix,count);
     if (count_solutions == 2) {
-        printf("Sudoku has more 1 solution");
+        printf("Sudoku has more than 1 solution");
         return 0;
     }
 
