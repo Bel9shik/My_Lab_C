@@ -532,7 +532,7 @@ int count_solve(int row, int col, char** matrix, int count){
     //ищем два решения
     //выходим из цикла, если найдём 2 решения
     for (int val = 1; val <= 9 && count < 2; val++) {
-        if (legal(row, col, val, matrix)) {
+        if (legal(row, col, val, (const char **) matrix)) {
             matrix[row][col] = (char)val;
             count = count_solve(row + 1, col, matrix, count);
         }
