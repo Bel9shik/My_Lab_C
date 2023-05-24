@@ -10,9 +10,10 @@ enum SudokuResults{
     SUDOKU_ALREADY_SOLVED
 };
 
-int sudoku_solver(char** matrix, int** rows, int** columns, int** boxes);
+int sudoku_solver(char** matrix, char** rows, char** columns, char** boxes);
 int count_solve(int row, int col, char** matrix, int count);
 int legal(int row, int col, int val, const char** matrix);
+void free_resources(char** matrix, char** rows, char** columns, char** boxes);
 
 int main(void){
 
@@ -32,7 +33,6 @@ int main(void){
 
     char** matrix = calloc(SUDOKU_SIZE, sizeof(char *));
     if (matrix == NULL) {
-        free(matrix);
         printf("Can't create the array. Not enough memory ?");
         fclose(fl_in);
         return ENOMEM;
@@ -40,86 +40,58 @@ int main(void){
     for (int i = 0; i < SUDOKU_SIZE; i++) {
         matrix[i] = calloc(SUDOKU_SIZE, sizeof(char));
         if (matrix[i] == NULL) {
-            for (int j = 0; j != i; j++) free(matrix[j]);
-            free(matrix);
+            free_resources(matrix, NULL, NULL, NULL);
             printf("Can't create array. Not enough memory ?");
             fclose(fl_in);
             return ENOMEM;
         }
     }
 
-    int** rows = calloc(SUDOKU_SIZE, sizeof(int *));
+    char** rows = calloc(SUDOKU_SIZE, sizeof(char *));
     if (rows == NULL) {
-        free(rows);
-        for (int k = 0; k < SUDOKU_SIZE; k++) free(matrix[k]);
-        free(matrix);
+        free_resources(matrix, NULL, NULL, NULL);
         printf("Can't create array. Not enough memory ?");
         fclose(fl_in);
         return ENOMEM;
     }
     for (int i = 0; i < SUDOKU_SIZE; i++) {
-        rows[i] = calloc(SUDOKU_SIZE + 1, sizeof(int));
+        rows[i] = calloc(SUDOKU_SIZE + 1, sizeof(char));
         if (rows[i] == NULL) {
-            for (int k = 0; k < SUDOKU_SIZE; k++) free(matrix[k]);
-            free(matrix);
-            for (int j = 0; j != i; j++) free(rows[j]);
-            free(rows);
+            free_resources(matrix, rows, NULL, NULL);
             printf("Can't create array. Not enough memory ?");
             fclose(fl_in);
             return ENOMEM;
         }
     }
 
-    int** columns = calloc(SUDOKU_SIZE, sizeof(int *));
+    char** columns = calloc(SUDOKU_SIZE, sizeof(char *));
     if (columns == NULL) {
-        free(columns);
-        for (int k = 0; k < SUDOKU_SIZE; k++) free(matrix[k]);
-        free(matrix);
-        for (int j = 0; j < SUDOKU_SIZE ; j++) free(rows[j]);
-        free(rows);
+        free_resources(matrix, rows, NULL, NULL);
         printf("Can't create array. Not enough memory ?");
         fclose(fl_in);
         return ENOMEM;
     }
     for(int i = 0; i < SUDOKU_SIZE; i++){
-        columns[i] = calloc(SUDOKU_SIZE + 1, sizeof(int));
+        columns[i] = calloc(SUDOKU_SIZE + 1, sizeof(char));
         if(columns[i] == NULL){
-            for (int k = 0; k < SUDOKU_SIZE; k++) free(matrix[k]);
-            free(matrix);
-            for (int j = 0; j < SUDOKU_SIZE; j++) free(rows[j]);
-            free(rows);
-            for (int j = 0; j != i; j++) free(columns[j]);
-            free(columns);
+            free_resources(matrix, rows, columns, NULL);
             printf("Can't create array. Not enough memory ?");
             fclose(fl_in);
             return ENOMEM;
         }
     }
 
-    int** boxes = calloc(SUDOKU_SIZE, sizeof(int *));
+    char** boxes = calloc(SUDOKU_SIZE, sizeof(char *));
     if(boxes == NULL){
-        free(boxes);
-        for (int k = 0; k < SUDOKU_SIZE; k++) free(matrix[k]);
-        free(matrix);
-        for (int j = 0; j < SUDOKU_SIZE; j++) free(rows[j]);
-        free(rows);
-        for (int j = 0; j < SUDOKU_SIZE; j++) free(columns[j]);
-        free(columns);
+        free_resources(matrix, rows, columns, NULL);
         printf("Can't create array. Not enough memory ?");
         fclose(fl_in);
         return ENOMEM;
     }
     for (int i = 0; i < SUDOKU_SIZE; i++) {
-        boxes[i] = calloc(SUDOKU_SIZE + 1, sizeof(int));
+        boxes[i] = calloc(SUDOKU_SIZE + 1, sizeof(char));
         if (boxes[i] == NULL) {
-            for (int k = 0; k < SUDOKU_SIZE; k++) free(matrix[k]);
-            free(matrix);
-            for (int j = 0; j < SUDOKU_SIZE; j++) free(rows[j]);
-            free(rows);
-            for (int j = 0; j < SUDOKU_SIZE; j++) free(columns[j]);
-            free(columns);
-            for (int j = 0; j != i; j++) free(boxes[j]);
-            free(boxes);
+            free_resources(matrix, rows, columns, boxes);
             printf("Can't create array. Not enough memory ?");
             fclose(fl_in);
             return ENOMEM;
@@ -134,16 +106,7 @@ int main(void){
         fscanf(fl_in, "%c", &curVal);
         if(feof(fl_in)){
             printf("Incorrect input data");
-            for (int k = 0; k < SUDOKU_SIZE; k++) {
-                free(rows[k]);
-                free(columns[k]);
-                free(boxes[k]);
-                free(matrix[k]);
-            }
-            free(matrix);
-            free(rows);
-            free(columns);
-            free(boxes);
+            free_resources(matrix, rows, columns, boxes);
             fclose(fl_in);
             return 0;
         }
@@ -160,32 +123,14 @@ int main(void){
                 // неверный ввод
             else {
                 printf("Incorrect input data");
-                for (int k = 0; k < SUDOKU_SIZE; k++) {
-                    free(rows[k]);
-                    free(columns[k]);
-                    free(boxes[k]);
-                    free(matrix[k]);
-                }
-                free(matrix);
-                free(rows);
-                free(columns);
-                free(boxes);
+                free_resources(matrix, rows, columns, boxes);
                 fclose(fl_in);
                 return 0;
             }
             while (fscanf(fl_in, "%c", &curVal) != EOF) {
                 if (curVal == '\n' || curVal == '\t' || curVal == ' ') continue;
                 printf("Incorrect input data");
-                for (int k = 0; k < SUDOKU_SIZE; k++) {
-                    free(rows[k]);
-                    free(columns[k]);
-                    free(boxes[k]);
-                    free(matrix[k]);
-                }
-                free(matrix);
-                free(rows);
-                free(columns);
-                free(boxes);
+                free_resources(matrix, rows, columns, boxes);
                 fclose(fl_in);
                 return 0;
             }
@@ -199,16 +144,7 @@ int main(void){
                 continue;
             } else {
                 printf("Incorrect input data");
-                for (int k = 0; k < SUDOKU_SIZE; k++) {
-                    free(rows[k]);
-                    free(columns[k]);
-                    free(boxes[k]);
-                    free(matrix[k]);
-                }
-                free(matrix);
-                free(rows);
-                free(columns);
-                free(boxes);
+                free_resources(matrix, rows, columns, boxes);
                 fclose(fl_in);
                 return 0;
             }
@@ -235,16 +171,7 @@ int main(void){
             boxes[box_ind][SUDOKU_SIZE]++; // увеличиваем количество заполненных ячеек в квадрате
         } else if (curVal != '.'){
             printf("Incorrect input data");
-            for (int k = 0; k < SUDOKU_SIZE; k++) {
-                free(rows[k]);
-                free(columns[k]);
-                free(boxes[k]);
-                free(matrix[k]);
-            }
-            free(matrix);
-            free(rows);
-            free(columns);
-            free(boxes);
+            free_resources(matrix, rows, columns, boxes);
             fclose(fl_in);
             return 0;
         }
@@ -255,16 +182,7 @@ int main(void){
         for (int l = 0; l < SUDOKU_SIZE; l++) {
             if (boxes[k][l] > 1 || rows[k][l] > 1 || columns[k][l] > 1) {
                 printf("Incorrect input data");
-                for (int g = 0; g < SUDOKU_SIZE; g++) {
-                    free(rows[g]);
-                    free(columns[g]);
-                    free(boxes[g]);
-                    free(matrix[g]);
-                }
-                free(matrix);
-                free(rows);
-                free(columns);
-                free(boxes);
+                free_resources(matrix, rows, columns, boxes);
                 fclose(fl_in);
                 return 0;
             }
@@ -276,16 +194,7 @@ int main(void){
     int count_solutions = count_solve(i,j,matrix,count);
     if (count_solutions > 1) {
         printf("Sudoku has more than 1 solution");
-        for (int k = 0; k < SUDOKU_SIZE; k++) {
-            free(rows[k]);
-            free(columns[k]);
-            free(boxes[k]);
-            free(matrix[k]);
-        }
-        free(matrix);
-        free(rows);
-        free(columns);
-        free(boxes);
+        free_resources(matrix, rows, columns, boxes);
         fclose(fl_in);
         return 0;
     }
@@ -294,32 +203,14 @@ int main(void){
     int res = sudoku_solver(matrix, rows, columns, boxes);
     if (res == NO_SOLUTIONS) {
         printf("No solutions");
-        for (int k = 0; k < SUDOKU_SIZE; k++) {
-            free(rows[k]);
-            free(columns[k]);
-            free(boxes[k]);
-            free(matrix[k]);
-        }
-        free(matrix);
-        free(rows);
-        free(columns);
-        free(boxes);
+        free_resources(matrix, rows, columns, boxes);
         fclose(fl_in);
         return 0;
     }
         // если на входе дана уже решенная судоку
     else if (res == SUDOKU_ALREADY_SOLVED) {
         printf("This sudoku already solved");
-        for (int k = 0; k < SUDOKU_SIZE; k++) {
-            free(rows[k]);
-            free(columns[k]);
-            free(boxes[k]);
-            free(matrix[k]);
-        }
-        free(matrix);
-        free(rows);
-        free(columns);
-        free(boxes);
+        free_resources(matrix, rows, columns, boxes);
         fclose(fl_in);
         return 0;
     }
@@ -332,23 +223,13 @@ int main(void){
         printf("\n");
     }
     //освобождение памяти
-    for (int k = 0; k < SUDOKU_SIZE; k++) {
-        free(rows[k]);
-        free(columns[k]);
-        free(boxes[k]);
-        free(matrix[k]);
-    }
-    free(matrix);
-    free(rows);
-    free(columns);
-    free(boxes);
-
+    free_resources(matrix, rows, columns, boxes);
     fclose(fl_in);
     return 0;
 }
 
 
-int sudoku_solver(char** matrix, int** rows, int** columns, int** boxes){
+int sudoku_solver(char** matrix, char** rows, char** columns, char** boxes){
     int tmp_maxSum = -10, type  = 0, maxIndex = -10, total_filled_cells = 0;
 /* tmp_maxSum - переменная для того, чтобы понять максимальное количество заполненных ячеек (меньше 9)
  * type  - переменная для того, чтобы понять где больше всего заполнено ячеек (в строке, в столбце или в квадрате)
@@ -517,6 +398,25 @@ int sudoku_solver(char** matrix, int** rows, int** columns, int** boxes){
         }
     }
     return NO_SOLUTIONS;
+}
+
+void free_resources(char** matrix, char** rows, char** columns, char** boxes){
+    if (matrix != NULL) {
+        for (int i = 0; i < SUDOKU_SIZE && matrix[i] != NULL; i++) free(matrix[i]);
+        free(matrix);
+    }
+    if (rows != NULL) {
+        for (int i = 0; i < SUDOKU_SIZE && rows[i] != NULL; i++) free(rows[i]);
+        free(rows);
+    }
+    if (columns != NULL) {
+        for (int i = 0; i < SUDOKU_SIZE && columns[i] != NULL; i++) free(columns[i]);
+        free(columns);
+    }
+    if (boxes != NULL) {
+        for (int i = 0; i < SUDOKU_SIZE && boxes[i] != NULL; i++) free(boxes[i]);
+        free(boxes);
+    }
 }
 
 int count_solve(int row, int col, char** matrix, int count){
