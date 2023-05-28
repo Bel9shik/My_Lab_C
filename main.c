@@ -103,12 +103,13 @@ int main(void){
     int curNum;
     // считывание всех '\n' (сделано, для того, чтобы не было проблем с вводом данных)
     while (curVal == '\n') {
-        fscanf(fl_in, "%c", &curVal);
-        if(feof(fl_in)){
-            printf("Incorrect input data");
-            free_resources(matrix, rows, columns, boxes);
-            fclose(fl_in);
-            return 0;
+        if (fscanf(fl_in, "%c", &curVal) != 1) {
+            if (feof(fl_in)) {
+                printf("Incorrect input data");
+                free_resources(matrix, rows, columns, boxes);
+                fclose(fl_in);
+                return 0;
+            }
         }
     }
     //в последний раз сработал while и указатель сместился на символ правее, поэтому эта строка нужна, чтобы вернуть указатель на нужное место
