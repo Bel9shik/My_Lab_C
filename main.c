@@ -27,6 +27,7 @@ int main(void){
     // если файл пустой
     if (poss == 0){
         printf("File is empty");
+        fclose(fl_in);
         return EIO;
     }
     fseek(fl_in, 0, SEEK_SET); // восстановление указателя на начало файла
